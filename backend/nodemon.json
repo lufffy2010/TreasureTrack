@@ -1,0 +1,6 @@
+{
+  "watch": ["server.js", "routes", "controllers", "models"],
+  "ext": "js,json",
+  "ignore": ["eslint.config.js"],
+  "exec": "node server.js"
+}
