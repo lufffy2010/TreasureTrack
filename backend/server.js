@@ -71,4 +71,28 @@ app.listen(PORT, () => {
   console.log('1. Check .env file exists in backend folder');
   console.log('2. Verify MongoDB Atlas cluster is active');
   console.log('3. Check Network Access in MongoDB Atlas');
+
+  // Server mein ye add karo
+  const path = require('path');
+  const express = require('express');
+
+  const app = express();
+
+  // Static files serve karo
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  // API routes yahan pe
+  app.get('/api/data', (req, res) => {
+    res.json({ message: 'Hello from API' });
+  });
+
+  // SPA ke liye 404 handling
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });
