@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd frontend && npm install && npm run build"
+
+[deploy]
+publicDir = "frontend/dist"
+restartPolicyType = "ON_FAILURE"
+
+[[services]]
+name = "web"
+httpPort = 3000
