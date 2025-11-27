@@ -8,7 +8,7 @@ import { ThemeProvider } from './components/theme-provider'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter basename="/treasure-track">
+    <BrowserRouter basename="/TreasureTrack">
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <App />
       </ThemeProvider>
