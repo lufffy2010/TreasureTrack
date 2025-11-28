@@ -240,7 +240,7 @@ export const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       if (token && newData.xp !== undefined) {
-        const response = await fetch('http://localhost:3001/api/auth/xp', {
+        const response = await fetch('/api/auth/xp', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

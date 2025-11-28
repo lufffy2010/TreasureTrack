@@ -211,6 +211,7 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
         className="gap-2"
       >
         <span className="text-2xl">{profile?.avatar || selectedAvatar}</span>
+        <span className="hidden sm:inline text-sm font-medium">{profile?.username || user?.username || "Profile"}</span>
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

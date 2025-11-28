@@ -7,7 +7,23 @@ import authRoutes from './routes/authRoutes.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration - allow frontend URLs
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? [
+      'https://your-frontend-domain.com', // Replace with your actual frontend domain
+      'https://yourusername.github.io', // If using GitHub Pages
+      /\.railway\.app$/, // Allow Railway preview deployments
+      /\.vercel\.app$/, // If using Vercel
+      /\.netlify\.app$/ // If using Netlify
+    ]
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'], // Development
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
@@ -49,7 +65,20 @@ mongoose.connect(MONGODB_URI, {
     console.log('4. Database user has correct permissions');
   });
 
-// Better health check
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: '🌊 TreasureTrack API is running!',
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth/*'
+    }
+  });
+});
+
+// Health check endpoint
 app.get('/api/health', (req, res) => {
   const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
   const connectionInfo = {
@@ -62,15 +91,16 @@ app.get('/api/health', (req, res) => {
   res.json(connectionInfo);
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
+// Use PORT from environment variable (Railway) or default to 3001
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
   console.log('');
   console.log('🔧 Debugging Tips:');
   console.log('1. Check .env file exists in backend folder');
   console.log('2. Verify MongoDB Atlas cluster is active');
   console.log('3. Check Network Access in MongoDB Atlas');
-
-
 });

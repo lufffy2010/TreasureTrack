@@ -7,18 +7,23 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "src") },
   },
+
+  // 👇 Correct base URL (your actual repo name)
   base: "/TreasureTrack/",
+
+  // 👇 Output ALWAYS in dist folder (required for gh-pages)
   build: {
-    outDir: "../docs",
+    outDir: "dist",
     emptyOutDir: true,
   },
+
   server: {
     port: 5174,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
+      "/api": {
+        target: "http://localhost:3001",
         changeOrigin: true,
-      }
-    }
-  }
+      },
+    },
+  },
 });
