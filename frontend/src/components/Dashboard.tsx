@@ -1,6 +1,7 @@
 import { BackendUser } from "@/types/User";
 import { useState, useEffect } from "react";
 import { formatDateKeyIST, UserData } from "@/lib/storage";
+import { API_URL } from "@/config";
 import { QuoteCard } from "./QuoteCard";
 import { StreakCard } from "./StreakCard";
 import { CalendarView } from "./CalendarView";
@@ -240,7 +241,7 @@ export const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       if (token && newData.xp !== undefined) {
-        const response = await fetch('/api/auth/xp', {
+        const response = await fetch(`${API_URL}/api/auth/xp`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

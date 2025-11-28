@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { NotificationSettings } from "./NotificationSettings";
 import { DaySummary } from "./DaySummary";
 import { useAuth } from "@/hooks/useAuth";
+import { API_URL } from "@/config";
 
 import {
   Dialog,
@@ -39,7 +40,7 @@ export const Sidebar = ({ activeView, onViewChange, userData }: SidebarProps) =>
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/auth/me', {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;

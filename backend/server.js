@@ -12,8 +12,7 @@ const app = express();
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
     ? [
-      'https://your-frontend-domain.com', // Replace with your actual frontend domain
-      'https://yourusername.github.io', // If using GitHub Pages
+      'https://lufffy2010.github.io', // Your GitHub Pages domain
       /\.railway\.app$/, // Allow Railway preview deployments
       /\.vercel\.app$/, // If using Vercel
       /\.netlify\.app$/ // If using Netlify

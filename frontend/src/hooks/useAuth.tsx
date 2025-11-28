@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_URL } from '@/config';
 
 type BackendUser = {
   _id: string;
@@ -20,7 +21,7 @@ export const useAuth = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:3001/api/auth/me', {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {

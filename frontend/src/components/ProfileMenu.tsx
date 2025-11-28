@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LogOut, User, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { usernameSchema } from "@/lib/validation";
+import { API_URL } from "@/config";
 
 const avatarOptions = [
   "🏴", "⚔️", "🔱", "⚓", "🦜", "🧭", "💀", "🏴‍☠️", "🗡️", "🚢", "🍻", "💰", "🗺️", "💬", "👑"
@@ -70,7 +71,7 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
       const token = localStorage.getItem('token');
       console.log('Loading profile with token:', token ? 'exists' : 'missing');
 
-      const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
       console.log('Profile response status:', res.status);
 
       if (!res.ok) {
@@ -108,7 +109,7 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
       const token = localStorage.getItem('token');
       console.log('Updating profile:', { username: newUsername.trim(), avatar: selectedAvatar });
 
-      const res = await fetch('/api/auth/profile', {
+      const res = await fetch(`${API_URL}/api/auth/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ username: newUsername.trim(), avatar: selectedAvatar }),
@@ -160,7 +161,7 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
       const token = localStorage.getItem('token');
       console.log('Deleting account...');
 
-      const res = await fetch('/api/auth/profile', {
+      const res = await fetch(`${API_URL}/api/auth/profile`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

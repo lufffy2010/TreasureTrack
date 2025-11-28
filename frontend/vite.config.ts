@@ -21,7 +21,7 @@ export default defineConfig({
     port: 5174,
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "https://treasure-backen-production.up.railway.app",
         changeOrigin: true,
       },
     },

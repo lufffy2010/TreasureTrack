@@ -4,6 +4,7 @@ import { Trophy, Medal, Crown, User } from "lucide-react";
 import { getRankByXP } from "@/lib/rankSystem";
 import { Skeleton } from "@/components/ui/skeleton";
 import confetti from "canvas-confetti";
+import { API_URL } from "@/config";
 
 interface Profile {
   id: string;
@@ -28,7 +29,7 @@ export const Leaderboard = ({ currentUserId }: LeaderboardProps) => {
     const query = currentUserId ? `?userId=${encodeURIComponent(currentUserId)}` : "";
     if (typeof window !== 'undefined' && 'EventSource' in window) {
       try {
-        es = new EventSource(`http://localhost:3001/api/auth/leaderboard/stream${query}`);
+        es = new EventSource(`${API_URL}/api/auth/leaderboard/stream${query}`);
         es.onmessage = (e) => {
           try {
             const data = JSON.parse(e.data);
@@ -76,7 +77,7 @@ export const Leaderboard = ({ currentUserId }: LeaderboardProps) => {
   const fetchLeaderboard = async () => {
     try {
       const query = currentUserId ? `?userId=${encodeURIComponent(currentUserId)}` : "";
-      const resp = await fetch(`http://localhost:3001/api/auth/leaderboard${query}`);
+      const resp = await fetch(`${API_URL}/api/auth/leaderboard${query}`);
       if (!resp.ok) throw new Error('Failed to fetch leaderboard');
       const data = await resp.json();
       setProfiles(data.leaderboard || []);
