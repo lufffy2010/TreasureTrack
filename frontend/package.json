@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "http://localhost:5174/treasure-track/",
+  "homepage": "https://lufffy2010.github.io/TreasureTrack/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
