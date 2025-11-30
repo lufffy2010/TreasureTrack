@@ -1,7 +1,6 @@
 import { BackendUser } from "@/types/User";
 import { useState, useEffect } from "react";
 import { formatDateKeyIST, UserData } from "@/lib/storage";
-import { API_URL } from "@/config";
 import { QuoteCard } from "./QuoteCard";
 import { StreakCard } from "./StreakCard";
 import { CalendarView } from "./CalendarView";
@@ -23,6 +22,7 @@ import { checkAndAwardBadges, getBadgeById } from "@/lib/badgeSystem";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import confetti from "canvas-confetti";
+import { api } from "@/services/api";
 
 export const Dashboard = () => {
   const { toast } = useToast();
@@ -69,7 +69,7 @@ export const Dashboard = () => {
   useEffect(() => {
     if (isMobileSidebarOpen || selectedDate) {
       if (!historyStatePushed) {
-        window.history.pushState({ uiOpen: true }, '');
+        window.history.pushState({ uiOpen: true }, '', window.location.pathname + window.location.search);
         setHistoryStatePushed(true);
       }
     } else {
@@ -239,20 +239,8 @@ export const Dashboard = () => {
 
     // Sync XP to database
     try {
-      const token = localStorage.getItem('token');
-      if (token && newData.xp !== undefined) {
-        const response = await fetch(`${API_URL}/api/auth/xp`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ xp: newData.xp })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to sync XP');
-        }
+      if (newData.xp !== undefined) {
+        await api.updateXP(newData.xp);
       }
     } catch (error) {
       console.error('Failed to sync XP to database:', error);
