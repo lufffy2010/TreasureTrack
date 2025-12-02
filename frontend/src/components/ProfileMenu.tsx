@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LogOut, User, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { usernameSchema } from "@/lib/validation";
-import { API_URL } from "@/config";
+import { api } from "@/services/api";
 
 const avatarOptions = [
   "🏴", "⚔️", "🔱", "⚓", "🦜", "🧭", "💀", "🏴‍☠️", "🗡️", "🚢", "🍻", "💰", "🗺️", "💬", "👑"
@@ -51,7 +51,7 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
     };
 
     if (isOpen && !historyPushed) {
-      window.history.pushState({ dialogOpen: true }, '', window.location.pathname + window.location.search);
+      window.history.pushState({ dialogOpen: true }, '', window.location.pathname);
       setHistoryPushed(true);
       window.addEventListener('popstate', handlePopState);
     }
@@ -71,21 +71,13 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
       const token = localStorage.getItem('token');
       console.log('Loading profile with token:', token ? 'exists' : 'missing');
 
-      const res = await fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
-      console.log('Profile response status:', res.status);
+      const data = await api.getCurrentUser(token || undefined);
+      console.log('Profile data received:', data);
 
-      if (!res.ok) {
-        console.error('Failed to load profile:', res.statusText);
-        return;
-      }
-
-      const json = await res.json();
-      console.log('Profile data received:', json);
-
-      const data = json.user;
-      setProfile(data);
-      setNewUsername(data?.username || "");
-      setSelectedAvatar(data?.avatar || avatarOptions[0]);
+      const userData = data.user;
+      setProfile(userData);
+      setNewUsername(userData?.username || "");
+      setSelectedAvatar(userData?.avatar || avatarOptions[0]);
     } catch (error) {
       console.error("Error loading profile:", error);
     }
@@ -106,31 +98,12 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
 
     try {
       // Update via backend
-      const token = localStorage.getItem('token');
       console.log('Updating profile:', { username: newUsername.trim(), avatar: selectedAvatar });
 
-      const res = await fetch(`${API_URL}/api/auth/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ username: newUsername.trim(), avatar: selectedAvatar }),
+      await api.updateProfile({
+        username: newUsername.trim(),
+        avatar: selectedAvatar,
       });
-
-      console.log('Update response status:', res.status);
-
-      if (!res.ok) {
-        const err = await res.json();
-        console.error('Update failed:', err);
-
-        if (err?.message === 'Username already taken') {
-          setError('Username already taken');
-          setIsSaving(false);
-          return;
-        }
-        throw new Error('Failed to update profile');
-      }
-
-      const responseData = await res.json();
-      console.log('Update successful:', responseData);
 
       toast.success("Profile Updated", {
         description: "Your profile has been saved successfully!",
@@ -142,7 +115,11 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
       setIsOpen(false);
     } catch (err: any) {
       console.error("Error updating profile:", err);
-      setError("Failed to update profile. Please try again.");
+      if (err.message === 'Username already taken') {
+        setError('Username already taken');
+      } else {
+        setError("Failed to update profile. Please try again.");
+      }
     } finally {
       setIsSaving(false);
     }
@@ -158,24 +135,8 @@ export const ProfileMenu = ({ onUpdate }: ProfileMenuProps) => {
 
     try {
       // Call backend to delete account
-      const token = localStorage.getItem('token');
       console.log('Deleting account...');
-
-      const res = await fetch(`${API_URL}/api/auth/profile`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      console.log('Delete response status:', res.status);
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error('Delete failed:', errorData);
-        throw new Error('Failed to delete account');
-      }
-
-      const responseData = await res.json();
-      console.log('Delete successful:', responseData);
+      await api.deleteAccount();
 
       // Clear all localStorage data for this user
       const userId = (user as any)?._id ?? (user as any)?.id;

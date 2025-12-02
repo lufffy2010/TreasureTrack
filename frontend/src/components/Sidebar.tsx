@@ -5,12 +5,11 @@ import { useEffect, useState } from "react";
 import { NotificationSettings } from "./NotificationSettings";
 import { DaySummary } from "./DaySummary";
 import { useAuth } from "@/hooks/useAuth";
-import { API_URL } from "@/config";
+import { api } from "@/services/api";
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -40,11 +39,7 @@ export const Sidebar = ({ activeView, onViewChange, userData }: SidebarProps) =>
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const data = await res.json();
+      const data = await api.getCurrentUser(token || undefined);
       setProfile(data.user);
     } catch (error) {
       console.error("Error loading profile:", error);

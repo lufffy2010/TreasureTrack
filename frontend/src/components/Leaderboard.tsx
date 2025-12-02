@@ -4,7 +4,7 @@ import { Trophy, Medal, Crown, User } from "lucide-react";
 import { getRankByXP } from "@/lib/rankSystem";
 import { Skeleton } from "@/components/ui/skeleton";
 import confetti from "canvas-confetti";
-import { API_URL } from "@/config";
+import { api } from "@/services/api";
 
 interface Profile {
   id: string;
@@ -26,10 +26,10 @@ export const Leaderboard = ({ currentUserId }: LeaderboardProps) => {
   useEffect(() => {
     // try SSE real-time stream first
     let es: EventSource | null = null;
-    const query = currentUserId ? `?userId=${encodeURIComponent(currentUserId)}` : "";
+
     if (typeof window !== 'undefined' && 'EventSource' in window) {
       try {
-        es = new EventSource(`${API_URL}/api/auth/leaderboard/stream${query}`);
+        es = new EventSource(api.getLeaderboardStreamUrl(currentUserId));
         es.onmessage = (e) => {
           try {
             const data = JSON.parse(e.data);
@@ -76,10 +76,7 @@ export const Leaderboard = ({ currentUserId }: LeaderboardProps) => {
 
   const fetchLeaderboard = async () => {
     try {
-      const query = currentUserId ? `?userId=${encodeURIComponent(currentUserId)}` : "";
-      const resp = await fetch(`${API_URL}/api/auth/leaderboard${query}`);
-      if (!resp.ok) throw new Error('Failed to fetch leaderboard');
-      const data = await resp.json();
+      const data = await api.getLeaderboard(currentUserId);
       setProfiles(data.leaderboard || []);
       if (data.rank) {
         setCurrentUserRank(data.rank);

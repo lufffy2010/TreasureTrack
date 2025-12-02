@@ -3,13 +3,5 @@ import { registerUser, loginUser, getCurrentUser, updateProfile, deleteAccount, 
 
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/me", getCurrentUser);
-router.put("/profile", updateProfile);
-router.delete("/profile", deleteAccount);
-router.put("/xp", updateXP);
-router.get("/leaderboard", getLeaderboard);
-router.get("/leaderboard/stream", getLeaderboardStream);
 
 export default router;

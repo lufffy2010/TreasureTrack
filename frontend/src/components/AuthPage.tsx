@@ -5,22 +5,10 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Flame, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
+import { api } from "@/services/api";
 
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { usernameSchema, passwordSchema } from "@/lib/validation";
-
-interface AuthResponse {
-  success: boolean;
-  message: string;
-  token?: string;
-  user?: {
-    _id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-}
 
 const avatarOptions = [
   "🏴‍☠️", "⚔️", "🗡️", "⚓", "🦜", "🌊", "💀", "🏴", "⛵", "🧭", "🔱", "💰", "🗺️", "🍻", "👑"
@@ -121,66 +109,50 @@ export const AuthPage = ({ onAuth }: AuthPageProps) => {
 
       setLoading(true);
 
-      // 🌐 BASE URL FOR BACKEND
-      const API_URL = "http://localhost:3001/api/auth";
-
       if (isLogin) {
-        // LOGIN CALL - using email for login
-        const loginRes = await axios.post<AuthResponse>(
-          `${API_URL}/login`,
-          {
-            email: email.trim(),
-            password: password.trim(),
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        // LOGIN CALL
+        const loginRes = await api.login({
+          email: email.trim(),
+          password: password.trim(),
+        });
 
-        if (loginRes.data?.token) {
-          localStorage.setItem("token", loginRes.data.token);
+        if (loginRes.token) {
+          localStorage.setItem("token", loginRes.token);
           toast.success("⚔️ Welcome back!");
           onAuth();
         } else {
-          setError(loginRes.data?.message ?? "Login failed");
+          setError(loginRes.message ?? "Login failed");
         }
       } else {
-        // REGISTER CALL - including email field
-        const registerRes = await axios.post<AuthResponse>(
-          `${API_URL}/register`,
-          {
-            username: username.trim(),
-            email: email.trim(),
-            password: password.trim(),
-            avatar: selectedAvatar,
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        // REGISTER CALL
+        const registerRes = await api.register({
+          username: username.trim(),
+          email: email.trim(),
+          password: password.trim(),
+          avatar: selectedAvatar,
+        });
 
-        if (!registerRes.data?.success && registerRes.data?.message) {
-          setError(registerRes.data.message);
+        if (!registerRes.success && registerRes.message) {
+          setError(registerRes.message);
           return;
         }
 
         toast.success("🏴‍☠️ Account created!");
 
         // AUTO LOGIN after registration
-        const loginRes = await axios.post<AuthResponse>(
-          `${API_URL}/login`,
-          {
-            email: email.trim(),
-            password: password.trim(),
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        const loginRes = await api.login({
+          email: email.trim(),
+          password: password.trim(),
+        });
 
-        if (loginRes.data?.token) {
-          localStorage.setItem("token", loginRes.data.token);
+        if (loginRes.token) {
+          localStorage.setItem("token", loginRes.token);
         }
 
         onAuth();
       }
     } catch (err: any) {
       const errorMessage =
-        err?.response?.data?.message ||
         err?.message ||
         "Unknown error occurred";
 
@@ -281,8 +253,8 @@ export const AuthPage = ({ onAuth }: AuthPageProps) => {
                     type="button"
                     onClick={() => handleAvatarSelect(avatar)}
                     className={`text-2xl p-2 rounded-xl transition ${selectedAvatar === avatar
-                        ? "bg-primary/20 ring-2 ring-primary"
-                        : "bg-muted hover:bg-muted/80"
+                      ? "bg-primary/20 ring-2 ring-primary"
+                      : "bg-muted hover:bg-muted/80"
                       }`}
                   >
                     {avatar}

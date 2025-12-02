@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
-import { API_URL } from '@/config';
-
-type BackendUser = {
-  _id: string;
-  username?: string;
-  email?: string;
-  avatar?: string;
-  xp?: number;
-  badges?: any[];
-};
+import { api, User } from '@/services/api';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<BackendUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchCurrent = async (token: string | null) => {
@@ -21,15 +12,8 @@ export const useAuth = () => {
       return;
     }
     try {
-      const res = await fetch(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        setUser(null);
-      } else {
-        const data = await res.json();
-        setUser(data.user ?? null);
-      }
+      const data = await api.getCurrentUser(token);
+      setUser(data.user ?? null);
     } catch (err) {
       setUser(null);
     } finally {
